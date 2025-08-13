@@ -126,15 +126,16 @@
         <div class="sidebar p-3">
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link active" href="{{ route('claims.create') }}">
                         <i class="bi bi-speedometer2"></i> Overdue
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-file-earmark-text"></i> Claims Applications
-                    </a>
-                </li>
+    <a class="nav-link {{ request()->routeIs('claims.pending') ? 'active' : '' }}" 
+       href="{{ route('claims.pending') }}">
+       <i class="bi bi-file-earmark-text me-2"></i> Pending Overdue 
+    </a>
+</li>
                 
                 
             </ul>

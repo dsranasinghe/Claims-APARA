@@ -1,0 +1,124 @@
+@extends('layouts.bankapp')
+
+@section('title', 'Pending Applications')
+
+@section('content')
+<div class="container-fluid py-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="bi bi-list-check me-2"></i> Pending Applications
+                </h3>
+                <div class="d-flex">
+                    <form method="GET" action="{{ route('claims.pending') }}" class="d-flex">
+                        <input type="text" name="search" class="form-control form-control-sm me-2" 
+                               placeholder="Search..." value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-sm btn-light">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                    <button class="btn btn-sm btn-light ms-2" id="refreshBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Application No</th>
+                            <th>Customer</th>
+                            <th>Amount Outstanding</th>
+                            <th>Date Submitted</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($pendingApplications as $claim)
+                        <tr>
+                            <td>{{ $claim->application_no }}</td>
+                            <td>{{ $claim->customer_name }}</td>
+                            <td>LKR {{ number_format($claim->amount_outstanding, 2) }}</td>
+<td>
+    @if(is_string($claim->created_at))
+        {{ \Carbon\Carbon::parse($claim->created_at)->format('Y-m-d') }}
+    @else
+        {{ $claim->created_at->format('Y-m-d') }}
+    @endif
+</td>
+                           <td>
+    @if($claim->status === 'pending' || is_null($claim->status))
+        <span class="badge bg-warning text-dark">Pending</span>
+    @else
+        <span class="badge bg-{{ $claim->status === 'approved' ? 'success' : 'danger' }}">
+            {{ ucfirst($claim->status) }}
+        </span>
+    @endif
+</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ route('claims.show', $claim->application_no) }}" 
+                                       class="btn btn-sm btn-outline-primary"
+                                       data-bs-toggle="tooltip" title="View Details">
+                                       <i class="bi bi-eye"></i>
+                                    </a>
+                                   @if(auth()->check() && auth()->user()->can('approve-payments'))
+    <form action="{{ route('claims.update-status', $claim->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="status" value="approved">
+        <button type="submit" class="btn btn-sm btn-outline-success"
+                data-bs-toggle="tooltip" title="Approve Claim">
+            <i class="bi bi-check-circle"></i>
+        </button>
+    </form>
+@endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4">No pending applications found</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            
+            @if($pendingApplications->hasPages())
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted">
+                    Showing {{ $pendingApplications->firstItem() }} to {{ $pendingApplications->lastItem() }} of {{ $pendingApplications->total() }} entries
+                </div>
+                {{ $pendingApplications->links() }}
+            </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+        
+        // Refresh button functionality
+        $('#refreshBtn').click(function() {
+            window.location.reload();
+        });
+    });
+</script>
+@endpush
