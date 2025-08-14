@@ -183,7 +183,7 @@ class OverdueClaimController extends Controller
     }
 
     return view('components.claims.pending', [
-        'pendingApplications' => $query->paginate(10) // Changed from pendingApplications to claims
+        'pendingApplications' => $query->paginate(10) 
     ]);
 }
 
