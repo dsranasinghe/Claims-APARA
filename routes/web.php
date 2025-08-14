@@ -10,12 +10,16 @@ use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome');  
 });
+
 Route::get('/bank-claim-dashboard', function (\Illuminate\Http\Request $request) {
-    if ($request->has('username')) {
-        session(['username' => $request->query('username')]);
-    }
+    session([
+        'username'   => $request->username,
+        'employee_id' => $request->employee_id,
+        'system'     => $request->system_choice
+    ]);
+
     return view('bankClaimDashboard');
 });
 
