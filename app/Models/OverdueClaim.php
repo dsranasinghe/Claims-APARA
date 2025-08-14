@@ -11,6 +11,18 @@ class OverdueClaim extends Model
 
     protected $table = 'apara_claims';
 
+    protected $casts = [
+    'status' => 'string'
+];
+
+     protected $attributes = [
+    'status' => 'pending'
+];
+
+     public static $statusRules = [
+    'status' => 'required|in:pending,paid'
+];
+
     protected $fillable = [
         'application_no',
         'bank_name',
@@ -29,6 +41,12 @@ class OverdueClaim extends Model
         'signature_name',
         'signature_designation',
         'bank_address',
-        'report_date'
+        'report_date',
+        'status'
     ];
+
+    public function application()
+    {
+        return $this->belongsTo(Application::class, 'application_no', 'application_no');
+    }
 }

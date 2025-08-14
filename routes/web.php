@@ -23,6 +23,18 @@ Route::get('/bank-claim-dashboard', function (\Illuminate\Http\Request $request)
 Route::get('/claims/create', [OverdueClaimController::class, 'create'])
     ->name('claims.create');
 
+
 // Store the claim form submission
 Route::post('/claims/{application}', [OverdueClaimController::class, 'store'])
     ->name('claims.store');
+
+Route::get('/claims/pending', [OverdueClaimController::class, 'pending'])
+    ->name('claims.pending');
+
+Route::get('/claims/{application_no}', [OverdueClaimController::class, 'show'])
+    ->name('claims.show');
+
+// Update payment status
+Route::put('/claims/{id}/status', [OverdueClaimController::class, 'updateStatus'])->name('claims.update-status');
+
+

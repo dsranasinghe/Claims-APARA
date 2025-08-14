@@ -25,5 +25,11 @@ class Application extends Model
     {
         return $this->belongsTo(Bank::class, 'bank_id', 'bank_id');
     }
+
+     // Define relationship to OverdueClaim
+    public function overdueClaim()
+    {
+        return $this->hasOne(OverdueClaim::class, 'application_no', 'application_no');
+    }
     
 }

@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('claims', function (Blueprint $table) {
+        Schema::create('apara_claims', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('status')->default('pending'); 
+
         });
     }
 
@@ -26,6 +28,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('claims');
+        Schema::dropIfExists('apara_claims');
     }
+
+
+    
 };

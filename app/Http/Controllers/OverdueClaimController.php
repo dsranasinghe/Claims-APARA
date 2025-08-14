@@ -6,6 +6,7 @@ use App\Models\OverdueClaim;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class OverdueClaimController extends Controller
 {
@@ -36,43 +37,76 @@ class OverdueClaimController extends Controller
     }
 
     public function create(Request $request)
-    {
-        // If search parameters were submitted
-        if ($request->has('id_no') || $request->has('passport_no')) {
-            $request->validate([
-                'id_no' => 'nullable|string|max:20',
-                'passport_no' => 'nullable|string|max:20'
-            ]);
+{
+    // If search parameters were submitted
+    if ($request->has('id_no') || $request->has('passport_no')) {
+        $request->validate([
+            'id_no' => 'nullable|string|max:20',
+            'passport_no' => 'nullable|string|max:20'
+        ]);
 
-            // Search using Eloquent with bank relationship
-            $application = Application::with('bank')
-                ->where('id_no', $request->id_no)
-                ->orWhere('passport_no', $request->passport_no)
-                ->first();
-            
-            if ($application) {
-                $claim = OverdueClaim::where('application_no', $application->application_no)->first();
-                return view('components.claims.create', [
-                    'application' => $application,
-                    'claim' => $claim,
-                    'searchPerformed' => true
-                ]);
-            }
-            
+        // Search for applications
+        $applications = Application::query()
+            ->when($request->id_no, function($query) use ($request) {
+                $query->where('id_no', 'like', '%'.$request->id_no.'%');
+            })
+            ->when($request->passport_no, function($query) use ($request) {
+                $query->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
+            })
+            ->with(['bank', 'overdueClaim'])
+            ->get();
+
+        // Get pending applications
+        $pendingApplications = OverdueClaim::where('status', 'pending')
+            ->whereHas('application', function($query) use ($request) {
+                $query->when($request->id_no, function($q) use ($request) {
+                    $q->where('id_no', 'like', '%'.$request->id_no.'%');
+                })
+                ->when($request->passport_no, function($q) use ($request) {
+                    $q->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
+                });
+            })
+            ->with('application')
+            ->get();
+
+        // If we found a matching application
+        if ($applications->count() === 1) {
             return view('components.claims.create', [
+                'application' => $applications->first(),
+                'claim' => $applications->first()->overdueClaim,
                 'searchPerformed' => true,
-                'application' => null,
-                'claim' => null
+                'pendingApplications' => $pendingApplications
             ]);
         }
-        
-        // Initial access - just show search form
+
         return view('components.claims.create', [
-            'searchPerformed' => false,
+            'searchPerformed' => true,
             'application' => null,
-            'claim' => null
+            'claim' => null,
+            'pendingApplications' => $pendingApplications
         ]);
     }
+    
+    // Initial access - just show search form
+    return view('components.claims.create', [
+        'searchPerformed' => false,
+        'application' => null,
+        'claim' => null,
+        'pendingApplications' => collect() // Empty collection
+    ]);
+}
+
+   public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:pending,paid'
+    ]);
+    
+    $claim = OverdueClaim::findOrFail($id);
+    $claim->update(['status' => $request->status]);
+    
+    return response()->json(['success' => true]);
+}
 
     public function store(Request $request, $applicationNo)
     {
@@ -128,7 +162,30 @@ class OverdueClaimController extends Controller
             ]
         );
 
-        return redirect()->route('claims.show', $applicationNo)
-            ->with('success', 'Claim report saved successfully!');
+        return redirect()->route('claims.create')
+        ->with('success', 'Claim saved successfully!')
+        ->withInput($request->only(['id_no', 'passport_no']));
     }
+
+
+   public function pending(Request $request)
+{
+    $query = OverdueClaim::query()
+        ->orderBy('created_at', 'desc');
+
+    // Optional: Add search functionality
+    if ($request->has('search') && !empty($request->search)) {
+        $query->where(function($q) use ($request) {
+            $q->where('application_no', 'like', "%{$request->search}%")
+              ->orWhere('customer_name', 'like', "%{$request->search}%")
+              ->orWhere('amount_outstanding', 'like', "%{$request->search}%");
+        });
+    }
+
+    return view('components.claims.pending', [
+        'pendingApplications' => $query->paginate(10) 
+    ]);
+}
+
+
 }
