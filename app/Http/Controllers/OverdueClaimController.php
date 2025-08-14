@@ -95,13 +95,19 @@ class OverdueClaimController extends Controller
         'pendingApplications' => collect() // Empty collection
     ]);
 }
-    public function updateStatus(Request $request, $id)
+
+   public function updateStatus(Request $request, $id)
 {
+    $request->validate([
+        'status' => 'required|in:pending,paid'
+    ]);
+    
     $claim = OverdueClaim::findOrFail($id);
     $claim->update(['status' => $request->status]);
-
-    return back()->with('success', 'Status updated successfully!');
+    
+    return response()->json(['success' => true]);
 }
+
     public function store(Request $request, $applicationNo)
     {
         $validated = $request->validate([
@@ -163,27 +169,23 @@ class OverdueClaimController extends Controller
 
 
    public function pending(Request $request)
-    {
-         $query = DB::table('apara_claims')
-        ->select('*', DB::raw('CAST(created_at AS DATETIME) as created_at'))
-        ->where(function($q) {
-            $q->where('status', 'pending')
-              ->orWhereNull('status');
-        })
+{
+    $query = OverdueClaim::query()
         ->orderBy('created_at', 'desc');
 
-        // Search functionality
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('application_no', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%")
-                  ->orWhere('amount_outstanding', 'like', "%{$search}%");
-            });
-        }
+    // Optional: Add search functionality
+    if ($request->has('search') && !empty($request->search)) {
+        $query->where(function($q) use ($request) {
+            $q->where('application_no', 'like', "%{$request->search}%")
+              ->orWhere('customer_name', 'like', "%{$request->search}%")
+              ->orWhere('amount_outstanding', 'like', "%{$request->search}%");
+        });
+    }
 
-    $pendingApplications = $query->paginate(10);
-
-    return view('components.claims.pending', compact('pendingApplications'));
+    return view('components.claims.pending', [
+        'pendingApplications' => $query->paginate(10) // Changed from pendingApplications to claims
+    ]);
 }
+
+
 }

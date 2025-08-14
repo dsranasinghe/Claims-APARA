@@ -11,6 +11,18 @@ class OverdueClaim extends Model
 
     protected $table = 'apara_claims';
 
+    protected $casts = [
+    'status' => 'string'
+];
+
+     protected $attributes = [
+    'status' => 'pending'
+];
+
+     public static $statusRules = [
+    'status' => 'required|in:pending,paid'
+];
+
     protected $fillable = [
         'application_no',
         'bank_name',

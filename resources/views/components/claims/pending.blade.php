@@ -57,15 +57,40 @@
         {{ $claim->created_at->format('Y-m-d') }}
     @endif
 </td>
-                           <td>
-    @if($claim->status === 'pending' || is_null($claim->status))
-        <span class="badge bg-warning text-dark">Pending</span>
-    @else
-        <span class="badge bg-{{ $claim->status === 'approved' ? 'success' : 'danger' }}">
-            {{ ucfirst($claim->status) }}
-        </span>
-    @endif
+                           
+<td x-data="{ status: '{{ $claim->status }}' }">
+    <template x-if="status === 'paid'">
+        <span class="badge bg-success">Paid</span>
+    </template>
+    <template x-if="status !== 'paid'">
+        <select 
+            x-model="status"
+            @change="
+                fetch('{{ route('claims.update-status', $claim->id) }}', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ status: status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Optional: Show success message
+                        const toast = new bootstrap.Toast(document.getElementById('statusToast'));
+                        toast.show();
+                    }
+                })
+            "
+            class="form-select form-select-sm"
+        >
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+        </select>
+    </template>
 </td>
+
                             <td>
                                 <div class="d-flex gap-2">
                                     <a href="{{ route('claims.show', $claim->application_no) }}" 
@@ -111,14 +136,40 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Initialize tooltips
-        $('[data-bs-toggle="tooltip"]').tooltip();
-        
-        // Refresh button functionality
-        $('#refreshBtn').click(function() {
-            window.location.reload();
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.status-form select').forEach(select => {
+        select.addEventListener('change', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const form = this.closest('form');
+            const row = this.closest('tr');
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                    'X-HTTP-Method-Override': 'PUT'
+                },
+                body: JSON.stringify({ status: this.value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Update the UI
+                    const statusCell = this.closest('td');
+                    statusCell.innerHTML = this.value === 'paid' 
+                        ? '<span class="badge bg-success">Paid</span>'
+                        : '<span class="badge bg-warning">Pending</span>';
+                    
+                    // Optional: Change row styling
+                    row.classList.toggle('table-success', this.value === 'paid');
+                    row.classList.toggle('table-warning', this.value === 'pending');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     });
+});
 </script>
 @endpush
