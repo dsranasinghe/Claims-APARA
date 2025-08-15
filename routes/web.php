@@ -13,14 +13,14 @@ Route::get('/', function () {
     return view('welcome');  
 });
 
-Route::get('/bank-claim-dashboard', function (\Illuminate\Http\Request $request) {
+Route::get('/slecic-claim-dashboard', function (\Illuminate\Http\Request $request) {
     session([
         'username'   => $request->username,
         'employee_id' => $request->employee_id,
-        'system'     => $request->system_choice
+        'department' => $request->department,
     ]);
 
-    return view('bankClaimDashboard');
+    return view('SlecicClaimDashboard');
 });
 
 // Display search form and process searches
