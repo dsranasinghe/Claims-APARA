@@ -38,6 +38,14 @@ class OverdueClaimController extends Controller
 
     public function create(Request $request)
 {
+
+
+    $username = $request->username ?? session('username');
+    session([
+        'username' => $username,
+        'employee_id' => $request->employee_id ?? session('employee_id'),
+        'department' => $request->department ?? session('department'),
+    ]);
     // If search parameters were submitted
     if ($request->has('id_no') || $request->has('passport_no')) {
         $request->validate([
@@ -80,6 +88,8 @@ class OverdueClaimController extends Controller
         }
 
         return view('components.claims.create', [
+            'username' => $username,
+            'searchPerformed' => false,
             'searchPerformed' => true,
             'application' => null,
             'claim' => null,

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot()
-    {
-        //
-    }
+{
+    // Share the username with all views
+    View::composer('*', function ($view) {
+        $view->with('username', session('username') ?? 'Bank User');
+    });
+}
 }
