@@ -17,15 +17,33 @@ Route::get('/bank-claim-dashboard', function (\Illuminate\Http\Request $request)
     session([
         'username'   => $request->username,
         'employee_id' => $request->employee_id,
-        'system'     => $request->system_choice
+        'department' => $request->department,
     ]);
 
     return view('bankClaimDashboard');
 });
 
-// Display search form and process searches
-Route::get('/claims/create', [OverdueClaimController::class, 'create'])
-    ->name('claims.create');
+
+Route::get('/claims/create', function (Request $request) {
+    // Store session data
+    session([
+        'username'   => $request->username ?? session('username'),
+        'employee_id' => $request->employee_id ?? session('employee_id'),
+        'department' => $request->department ?? session('department'),
+    ]);
+
+    // Initialize empty application data
+    $application = null;
+    $searchPerformed = false;
+
+    return view('components.claims.create', [
+        'username' => session('username'),
+        'application' => $application,
+        'searchPerformed' => $searchPerformed
+    ]);
+})->name('claims.create');
+
+
 
 
 // Store the claim form submission

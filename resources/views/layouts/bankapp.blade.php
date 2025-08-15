@@ -108,7 +108,7 @@
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
                         <img src="https://via.placeholder.com/32" alt="Profile" class="profile-img me-2">
-                        <strong>Bank User</strong>
+                        <strong>{{ $username ?? 'Bank User' }}</strong>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
