@@ -24,24 +24,8 @@ Route::get('/bank-claim-dashboard', function (\Illuminate\Http\Request $request)
 });
 
 
-Route::get('/claims/create', function (Request $request) {
-    // Store session data
-    session([
-        'username'   => $request->username ?? session('username'),
-        'employee_id' => $request->employee_id ?? session('employee_id'),
-        'department' => $request->department ?? session('department'),
-    ]);
-
-    // Initialize empty application data
-    $application = null;
-    $searchPerformed = false;
-
-    return view('components.claims.create', [
-        'username' => session('username'),
-        'application' => $application,
-        'searchPerformed' => $searchPerformed
-    ]);
-})->name('claims.create');
+Route::get('/claims/create', [OverdueClaimController::class, 'create'])
+    ->name('claims.create');
 
 
 
