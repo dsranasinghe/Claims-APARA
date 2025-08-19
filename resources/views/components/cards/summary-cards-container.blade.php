@@ -1,4 +1,5 @@
-<div class="row g-4 mb-4">
+<!-- summary-cards-container.blade.php -->
+<div class="row g-3 mb-4">
     @foreach($cards as $card)
     <div class="col-md-3 col-sm-6">
         <x-cards.summary-card 

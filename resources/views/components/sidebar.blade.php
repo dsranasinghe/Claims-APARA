@@ -7,15 +7,22 @@
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="#" class="nav-link active" aria-current="page">
+            <a href="#" class="nav-link" >
                 <i class="bi bi-house-door me-2"></i>
                 Home
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link">
+            <a href="{{ route('report-of-default') }}" 
+               class="nav-link {{ request()->routeIs('report-of-default') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark me-2"></i>
                 Report of Default
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link">
+                <i class="bi bi-list me-2"></i>
+                Claims Checklist
             </a>
         </li>
         <li>

@@ -23,6 +23,11 @@ Route::get('/slecic-claim-dashboard', function (\Illuminate\Http\Request $reques
     return view('SlecicClaimDashboard');
 });
 
+Route::get('/report-of-default', function () {
+    return view('pages.reportofdefault');
+})->name('report-of-default');
+
+
 
 Route::get('/claims/create', [OverdueClaimController::class, 'create'])
     ->name('claims.create');
