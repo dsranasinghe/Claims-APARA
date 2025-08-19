@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 
 
 
+
 Route::get('/', function () {
     return view('welcome');  
 });
@@ -27,20 +28,24 @@ Route::get('/slecic-claim-dashboard', function (\Illuminate\Http\Request $reques
 Route::get('/claims/create', [OverdueClaimController::class, 'create'])
     ->name('claims.create');
 
-
-
-
 // Store the claim form submission
 Route::post('/claims/{application}', [OverdueClaimController::class, 'store'])
+         ->middleware('bank.access')
+
     ->name('claims.store');
 
 Route::get('/claims/pending', [OverdueClaimController::class, 'pending'])
+        ->middleware('bank.access')
+
     ->name('claims.pending');
 
 Route::get('/claims/{application_no}', [OverdueClaimController::class, 'show'])
     ->name('claims.show');
 
 // Update payment status
-Route::put('/claims/{id}/status', [OverdueClaimController::class, 'updateStatus'])->name('claims.update-status');
+Route::put('/claims/{id}/status', [OverdueClaimController::class, 'updateStatus'])
+    ->middleware('bank.access')
+
+->name('claims.update-status');
 
 
