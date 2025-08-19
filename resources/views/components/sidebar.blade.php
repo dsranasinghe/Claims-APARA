@@ -19,8 +19,8 @@
                 Report of Default
             </a>
         </li>
-        <li>
-            <a href="#" class="nav-link">
+        <li><a href="{{ route('Claims-checklist') }}" 
+               class="nav-link {{ request()->routeIs('Claims-checklist') ? 'active' : '' }}">
                 <i class="bi bi-list me-2"></i>
                 Claims Checklist
             </a>

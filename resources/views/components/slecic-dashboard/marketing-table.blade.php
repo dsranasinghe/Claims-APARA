@@ -2,7 +2,7 @@
  <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white border-0 py-3">
         <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">Recent Applications</h5>
+            <h5 class="mb-0 fw-bold">Recent </h5>
             <div class="d-flex gap-2">
                 <div class="input-group input-group-sm" style="width: 200px;">
                     <span class="input-group-text bg-transparent border-end-0">
@@ -74,20 +74,26 @@
                             <td><div class="text-muted">{{ date('M d, Y', strtotime($row['submitted_at'])) }}</div></td>
 
                             <!-- Report of Default -->
-                            <td class="text-center">
+                            <td class="text-center py-3">
                                 @if($row['has_report'])
-                                    <i class="bi bi-file-text-fill text-info fs-5"></i>
+                                    <button class="btn btn-sm btn-outline-info rounded-3 px-3 d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-file-text"></i>
+                                        <span>View</span>
+                                    </button>
                                 @else
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted small">-</span>
                                 @endif
                             </td>
 
                             <!-- Claims Docs -->
-                            <td class="text-center">
+                            <td class="text-center py-3">
                                 @if($row['has_claims'])
-                                    <i class="bi bi-file-earmark-text-fill text-secondary fs-5"></i>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        <span>View</span>
+                                    </button>
                                 @else
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted small">-</span>
                                 @endif
                             </td>
 
