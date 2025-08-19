@@ -3,51 +3,59 @@
 @section('title', 'Overdue Claim Form')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid px-4 py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-9">
+        <div class="col-12 col-xl-10">
+            <!-- Modern Card Design -->
             @if(!$application && $searchPerformed)
-                <div class="alert alert-warning d-flex align-items-center mb-4">
+                <div class="alert alert-glass alert-warning d-flex align-items-center mb-4 animate-fade-in">
                     <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
                     <div>
                         <h5 class="alert-heading mb-1">No Application Found</h5>
-                        <p class="mb-0">No application found with the provided identification details.</p>
+                        <p class="mb-0">We couldn't find any applications matching your search criteria.</p>
                     </div>
                 </div>
             @endif
 
             @if(!$application)
-            <!-- Search Form -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-1"><i class="bi bi-search me-2"></i> Search Application</h3>
-                    <p class="mb-0 text-white-50">Enter customer identification details</p>
+            <!-- Modern Search Card -->
+            <div class="card glass-card border-0 shadow-soft mb-5 animate-slide-up">
+                <div class="card-header bg-gradient-primary text-white border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-search-heart fs-3 me-3"></i>
+                        <div>
+                            <h3 class="mb-0 fw-semibold">Customer Search</h3>
+                            <p class="mb-0 opacity-75">Find applications by identification details</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-lg-5">
                     <form method="GET" action="{{ route('claims.create') }}" class="needs-validation" novalidate>
-                        <div class="row g-3">
+                        <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="id_no" class="form-label fw-semibold">ID Number</label>
-                                <div class="input-group has-validation">
-                                    <span class="input-group-text bg-light-primary"><i class="bi bi-person-vcard text-primary"></i></span>
-                                    <input type="text" class="form-control" id="id_no" name="id_no" 
-                                           value="{{ old('id_no') }}" placeholder="Enter ID number">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control bg-soft border-0" id="id_no" name="id_no" 
+                                           value="{{ old('id_no') }}" placeholder="ID Number">
+                                    <label for="id_no" class="text-muted">
+                                        <i class="bi bi-person-vcard me-2"></i> ID Number
+                                    </label>
                                     <div class="invalid-feedback">
                                         Please provide a valid ID number
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="passport_no" class="form-label fw-semibold">Passport Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light-primary"><i class="bi bi-passport text-primary"></i></span>
-                                    <input type="text" class="form-control" id="passport_no" name="passport_no" 
-                                           value="{{ old('passport_no') }}" placeholder="Enter passport number">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control bg-soft border-0" id="passport_no" name="passport_no" 
+                                           value="{{ old('passport_no') }}" placeholder="Passport Number">
+                                    <label for="passport_no" class="text-muted">
+                                        <i class="bi bi-passport me-2"></i> Passport Number
+                                    </label>
                                 </div>
                             </div>
-                            <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-primary px-4 py-2">
-                                    <i class="bi bi-search me-2"></i> Search Application
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 py-3 shadow-sm">
+                                    <i class="bi bi-search me-2"></i> Search Applications
                                 </button>
                             </div>
                         </div>
@@ -55,26 +63,27 @@
                 </div>
             </div>
 
-           
-
             @else
-            <!-- Overdue Claim Form -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <!-- Modern Overdue Claim Form -->
+            <div class="card glass-card border-0 shadow-soft mb-5 animate-slide-up">
+                <div class="card-header bg-gradient-primary text-white border-0">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h3 class="mb-1"><i class="bi bi-file-earmark-text me-2"></i> Overdue Claim Report</h3>
-                            <p class="mb-0 text-white-50">Application #{{ $application->application_no }}</p>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-file-earmark-text fs-3 me-3"></i>
+                            <div>
+                                <h3 class="mb-0 fw-semibold">Overdue Claim Report</h3>
+                                <p class="mb-0 opacity-75">Application #{{ $application->application_no }}</p>
+                            </div>
                         </div>
-                        <span class="badge bg-white text-primary fs-6 px-3 py-2">
-                            <i class="bi bi-clock-history me-1"></i> {{ date('d M Y') }}
+                        <span class="badge bg-white text-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-calendar-check me-1"></i> {{ date('d M Y') }}
                         </span>
                     </div>
                 </div>
 
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-lg-5">
                     @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show mb-4 d-flex align-items-center">
+                        <div class="alert alert-glass alert-success alert-dismissible fade show mb-4 d-flex align-items-center animate-fade-in">
                             <i class="bi bi-check-circle-fill me-3 fs-4"></i>
                             <div class="flex-grow-1">
                                 {{ session('success') }}
@@ -88,133 +97,201 @@
 
                         <!-- 1. Bank & Customer Info -->
                         <section class="mb-5">
-                            <h5 class="fw-semibold text-secondary border-bottom pb-2 mb-4">
-                                <i class="bi bi-building me-2"></i> Bank & Customer Information
-                            </h5>
-                            <div class="row g-3">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-soft-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-building fs-4 text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-semibold">Bank & Customer Information</h5>
+                            </div>
+                            
+                            <div class="row g-4">
                                 <div class="col-md-6">
-                                    <x-overdue.input-group name="bank_name" label="Bank Name" 
-                                        value="{{ $application->bank->bank_name }}" icon="bi-bank" readonly />
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-soft border-0" id="bank_name" name="bank_name" 
+                                               value="{{ $application->bank->bank_name }}" readonly>
+                                        <label for="bank_name" class="text-muted">Bank Name</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <x-overdue.input-group name="branch_name" label="Branch" 
-                                        value="{{ $application->bank->branch_name }}" icon="bi-geo-alt" readonly />
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-soft border-0" id="branch_name" name="branch_name" 
+                                               value="{{ $application->bank->branch_name }}" readonly>
+                                        <label for="branch_name" class="text-muted">Branch</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <x-overdue.input-group name="customer_name" label="Customer Name" 
-                                        value="{{ $application->customer_name }}" icon="bi-person" readonly />
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-soft border-0" id="customer_name" name="customer_name" 
+                                               value="{{ $application->customer_name }}" readonly>
+                                        <label for="customer_name" class="text-muted">Customer Name</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <x-overdue.textarea-group name="customer_address" label="Customer Address" 
-                                        value="{{ $application->customer_address }}" rows="2" icon="bi-house-door" readonly />
+                                    <div class="form-floating">
+                                        <textarea class="form-control bg-soft border-0" id="customer_address" name="customer_address" 
+                                                  style="height: 100px" readonly>{{ $application->customer_address }}</textarea>
+                                        <label for="customer_address" class="text-muted">Customer Address</label>
+                                    </div>
                                 </div>
                             </div>
                         </section>
 
                         <!-- 2. Financial Info -->
                         <section class="mb-5">
-                            <h5 class="fw-semibold text-secondary border-bottom pb-2 mb-4">
-                                <i class="bi bi-cash-stack me-2"></i> Financial Information
-                            </h5>
-                            <div class="row g-3">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-soft-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-cash-stack fs-4 text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-semibold">Financial Information</h5>
+                            </div>
+                            
+                            <div class="row g-4">
                                 <div class="col-md-6">
-                                    <x-overdue.input-group name="total_repayments" label="Total Repayments (LKR)" 
-                                        type="number" step="0.01" icon="bi-cash-coin"
-                                        value="{{ $claim->total_repayments ?? old('total_repayments') }}" required />
+                                    <div class="form-floating">
+                                        <input type="number" step="0.01" class="form-control bg-soft border-0" id="total_repayments" name="total_repayments" 
+                                               value="{{ $claim->total_repayments ?? old('total_repayments') }}" required>
+                                        <label for="total_repayments" class="text-muted">Total Repayments (LKR)</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <x-overdue.input-group name="amount_outstanding" label="Amount Outstanding (LKR)" 
-                                        type="number" step="0.01" icon="bi-currency-exchange"
-                                        value="{{ $claim->amount_outstanding ?? old('amount_outstanding') }}" required />
+                                    <div class="form-floating">
+                                        <input type="number" step="0.01" class="form-control bg-soft border-0" id="amount_outstanding" name="amount_outstanding" 
+                                               value="{{ $claim->amount_outstanding ?? old('amount_outstanding') }}" required>
+                                        <label for="amount_outstanding" class="text-muted">Amount Outstanding (LKR)</label>
+                                    </div>
                                 </div>
                             </div>
                         </section>
 
                         <!-- 3. Default Info -->
                         <section class="mb-5">
-                            <h5 class="fw-semibold text-secondary border-bottom pb-2 mb-4">
-                                <i class="bi bi-exclamation-triangle me-2"></i> Default Information
-                            </h5>
-                            <x-overdue.textarea-group name="default_reasons" label="Reasons for Default" 
-                                value="{{ $claim->default_reasons ?? old('default_reasons') }}" rows="4" 
-                                icon="bi-chat-left-text" required />
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-soft-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-exclamation-triangle fs-4 text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-semibold">Default Information</h5>
+                            </div>
                             
-                            <div class="mb-4 mt-3">
-                                <label class="form-label fw-semibold">Demand Letter Sent?</label>
-                                <div class="d-flex gap-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="demand_made" id="demand_yes" 
-                                            value="1" {{ (old('demand_made', $claim->demand_made ?? null) == 1) ? 'checked' : '' }} required>
-                                        <label class="form-check-label" for="demand_yes">Yes</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="demand_made" id="demand_no" 
-                                            value="0" {{ (old('demand_made', $claim->demand_made ?? null) == 0) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="demand_no">No</label>
+                            <div class="form-floating mb-4">
+                                <textarea class="form-control bg-soft border-0" id="default_reasons" name="default_reasons" 
+                                          style="height: 120px" required>{{ $claim->default_reasons ?? old('default_reasons') }}</textarea>
+                                <label for="default_reasons" class="text-muted">Reasons for Default</label>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-muted mb-3">Demand Letter Sent?</label>
+                                <div class="btn-group w-100 shadow-sm" role="group">
+                                    <input type="radio" class="btn-check" name="demand_made" id="demand_yes" 
+                                           value="1" {{ (old('demand_made', $claim->demand_made ?? null) == 1) ? 'checked' : '' }} required>
+                                    <label class="btn btn-outline-primary" for="demand_yes">
+                                        <i class="bi bi-check-circle me-2"></i> Yes
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="demand_made" id="demand_no" 
+                                           value="0" {{ (old('demand_made', $claim->demand_made ?? null) == 0) ? 'checked' : '' }}>
+                                    <label class="btn btn-outline-primary" for="demand_no">
+                                        <i class="bi bi-x-circle me-2"></i> No
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="demand-letter-section" class="{{ (old('demand_made', $claim->demand_made ?? 0) ? '' : 'd-none') }} animate-fade-in">
+                                <div class="file-upload-card bg-soft p-4 rounded-3 mb-3">
+                                    <label class="form-label fw-semibold text-muted mb-3">Demand Letter Copy</label>
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1">
+                                            <input type="file" class="form-control bg-soft border-0" id="demand_letter" name="demand_letter">
+                                        </div>
+                                        @if(isset($claim->demand_letter_path))
+                                            <a href="{{ Storage::url($claim->demand_letter_path) }}" target="_blank" class="btn btn-sm btn-outline-primary ms-3">
+                                                <i class="bi bi-eye me-1"></i> View
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
 
-                            <div id="demand-letter-section" class="{{ (old('demand_made', $claim->demand_made ?? 0) ? '' : 'd-none') }}">
-                                <x-overdue.file-upload name="demand_letter" label="Demand Letter Copy" 
-                                    :currentFile="$claim->demand_letter_path ?? null" />
-                            </div>
-
-                            <div id="no-demand-reason-section" class="{{ !(old('demand_made', $claim->demand_made ?? 0) ? '' : 'd-none') }}">
-                                <x-overdue.textarea-group name="no_demand_reason" label="Reason for Not Sending Demand Letter" 
-                                    value="{{ $claim->no_demand_reason ?? old('no_demand_reason') }}" rows="3" 
-                                    icon="bi-chat-left-dots" />
+                            <div id="no-demand-reason-section" class="{{ !(old('demand_made', $claim->demand_made ?? 0) ? '' : 'd-none') }} animate-fade-in">
+                                <div class="form-floating">
+                                    <textarea class="form-control bg-soft border-0" id="no_demand_reason" name="no_demand_reason" 
+                                              style="height: 100px">{{ $claim->no_demand_reason ?? old('no_demand_reason') }}</textarea>
+                                    <label for="no_demand_reason" class="text-muted">Reason for Not Sending Demand Letter</label>
+                                </div>
                             </div>
                         </section>
 
                         <!-- 4. Recovery Info -->
                         <section class="mb-5">
-                            <h5 class="fw-semibold text-secondary border-bottom pb-2 mb-4">
-                                <i class="bi bi-lightning-charge me-2"></i> Recovery Information
-                            </h5>
-                            <x-overdue.textarea-group name="recovery_steps_taken" label="Steps Already Taken" 
-                                value="{{ $claim->recovery_steps_taken ?? old('recovery_steps_taken') }}" rows="4" 
-                                icon="bi-list-check" required />
-                            <x-overdue.textarea-group name="proposed_steps" label="Proposed Next Steps" 
-                                value="{{ $claim->proposed_steps ?? old('proposed_steps') }}" rows="4" 
-                                icon="bi-list-ol" required />
-                            <x-overdue.textarea-group name="additional_info" label="Additional Information" 
-                                value="{{ $claim->additional_info ?? old('additional_info') }}" rows="3" 
-                                icon="bi-info-circle" />
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-soft-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-lightning-charge fs-4 text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-semibold">Recovery Information</h5>
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                <textarea class="form-control bg-soft border-0" id="recovery_steps_taken" name="recovery_steps_taken" 
+                                          style="height: 120px" required>{{ $claim->recovery_steps_taken ?? old('recovery_steps_taken') }}</textarea>
+                                <label for="recovery_steps_taken" class="text-muted">Steps Already Taken</label>
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                <textarea class="form-control bg-soft border-0" id="proposed_steps" name="proposed_steps" 
+                                          style="height: 120px" required>{{ $claim->proposed_steps ?? old('proposed_steps') }}</textarea>
+                                <label for="proposed_steps" class="text-muted">Proposed Next Steps</label>
+                            </div>
+                            
+                            <div class="form-floating">
+                                <textarea class="form-control bg-soft border-0" id="additional_info" name="additional_info" 
+                                          style="height: 100px">{{ $claim->additional_info ?? old('additional_info') }}</textarea>
+                                <label for="additional_info" class="text-muted">Additional Information</label>
+                            </div>
                         </section>
 
                         <!-- 5. Bank Representative -->
                         <section class="mb-4">
-                            <h5 class="fw-semibold text-secondary border-bottom pb-2 mb-4">
-                                <i class="bi bi-person-badge me-2"></i> Bank Representative
-                            </h5>
-                            <div class="row g-3">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-soft-primary rounded-circle p-2 me-3">
+                                    <i class="bi bi-person-badge fs-4 text-primary"></i>
+                                </div>
+                                <h5 class="mb-0 fw-semibold">Bank Representative</h5>
+                            </div>
+                            
+                            <div class="row g-4">
                                 <div class="col-md-4">
-                                    <x-overdue.input-group name="signature_name" label="Representative Name" 
-                                        value="{{ $claim->signature_name ?? old('signature_name') }}" 
-                                        icon="bi-person-vcard" required />
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-soft border-0" id="signature_name" name="signature_name" 
+                                               value="{{ $claim->signature_name ?? old('signature_name') }}" required>
+                                        <label for="signature_name" class="text-muted">Representative Name</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <x-overdue.input-group name="signature_designation" label="Designation" 
-                                        value="{{ $claim->signature_designation ?? old('signature_designation') }}" 
-                                        icon="bi-person-lines-fill" required />
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-soft border-0" id="signature_designation" name="signature_designation" 
+                                               value="{{ $claim->signature_designation ?? old('signature_designation') }}" required>
+                                        <label for="signature_designation" class="text-muted">Designation</label>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <x-overdue.input-group name="report_date" label="Report Date" type="date" 
-                                        value="{{ $claim->report_date ?? old('report_date', date('Y-m-d')) }}" 
-                                        icon="bi-calendar-date" required />
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control bg-soft border-0" id="report_date" name="report_date" 
+                                               value="{{ $claim->report_date ?? old('report_date', date('Y-m-d')) }}" required>
+                                        <label for="report_date" class="text-muted">Report Date</label>
+                                    </div>
                                 </div>
                                 <div class="col-12">
-                                    <x-overdue.textarea-group name="bank_address" label="Bank Address" 
-                                        value="{{ $claim->bank_address ?? old('bank_address') }}" rows="2" 
-                                        icon="bi-geo-alt" required />
+                                    <div class="form-floating">
+                                        <textarea class="form-control bg-soft border-0" id="bank_address" name="bank_address" 
+                                                  style="height: 100px" required>{{ $claim->bank_address ?? old('bank_address') }}</textarea>
+                                        <label for="bank_address" class="text-muted">Bank Address</label>
+                                    </div>
                                 </div>
                             </div>
                         </section>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary px-5 py-2">
-                                <i class="bi bi-save me-2"></i> Save Claim
+                        <div class="d-flex justify-content-end mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow-sm">
+                                <i class="bi bi-save me-2"></i> Save Claim Report
                             </button>
                         </div>
                     </form>
@@ -227,66 +304,121 @@
 
 <style>
     :root {
-        --primary-blue: #1a3e72;
-        --light-blue: #ebf2ff;
+        --primary: #4361ee;
+        --primary-light: #4895ef;
+        --primary-dark: #3a0ca3;
+        --secondary: #f72585;
+        --success: #4cc9f0;
+        --warning: #f8961e;
+        --danger: #ef233c;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --glass: rgba(255, 255, 255, 0.15);
+        --soft-bg: rgba(67, 97, 238, 0.05);
     }
     
-    .bg-light-primary {
-        background-color: rgba(26, 62, 114, 0.1);
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     }
     
-    .card {
-        border-radius: 0.75rem;
-        border: none;
+    .bg-soft {
+        background-color: var(--soft-bg);
     }
     
-    .card-header {
-        border-radius: 0.75rem 0.75rem 0 0 !important;
-        padding: 1.25rem 1.5rem;
+    .bg-soft-primary {
+        background-color: rgba(67, 97, 238, 0.1);
     }
     
-    .form-control, .input-group-text, .form-select {
-        height: 45px;
+    .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .alert-glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .shadow-soft {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .file-upload-card {
+        border: 2px dashed rgba(67, 97, 238, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-card:hover {
+        border-color: var(--primary);
+        background-color: rgba(67, 97, 238, 0.08);
+    }
+    
+    /* Animations */
+    .animate-slide-up {
+        animation: slideUp 0.5s ease forwards;
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Form styling */
+    .form-control, .form-select, .form-floating>.form-control, .form-floating>.form-select {
         border-radius: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
     }
     
-    textarea.form-control {
-        min-height: 120px;
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
     }
     
-    .form-check-input {
-        width: 1.1em;
-        height: 1.1em;
-        margin-top: 0.15em;
+    .btn-check:checked + .btn-outline-primary {
+        background-color: var(--primary);
+        color: white;
     }
     
-    .form-label {
-        color: #2d3748;
-        font-weight: 500;
+    /* Floating labels */
+    .form-floating>label {
+        color: #6c757d;
     }
     
-    .input-group-text {
-        background-color: var(--light-blue);
-        color: var(--primary-blue);
+    .form-floating>.form-control:focus~label,
+    .form-floating>.form-control:not(:placeholder-shown)~label,
+    .form-floating>.form-select~label {
+        color: var(--primary);
+        background: white;
+        padding: 0 0.5rem;
+        transform: scale(0.85) translateY(-1.5rem) translateX(0.15rem);
     }
+
     
-    .btn-primary {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-    
-    .border-bottom {
-        border-color: #e2e8f0 !important;
-    }
-    
-    .alert {
-        border-left: 4px solid;
-    }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle demand letter sections
+    // Toggle demand letter sections with animation
     const demandRadios = document.querySelectorAll('input[name="demand_made"]');
     const letterSection = document.getElementById('demand-letter-section');
     const reasonSection = document.getElementById('no-demand-reason-section');
@@ -294,25 +426,53 @@ document.addEventListener('DOMContentLoaded', function() {
     if (demandRadios.length > 0) {
         function toggleSections() {
             const isDemandMade = document.querySelector('input[name="demand_made"]:checked').value === '1';
-            letterSection.classList.toggle('d-none', !isDemandMade);
-            reasonSection.classList.toggle('d-none', isDemandMade);
+            
+            if (isDemandMade) {
+                reasonSection.classList.add('d-none');
+                letterSection.classList.remove('d-none');
+            } else {
+                letterSection.classList.add('d-none');
+                reasonSection.classList.remove('d-none');
+            }
         }
 
         demandRadios.forEach(radio => radio.addEventListener('change', toggleSections));
         toggleSections();
     }
 
-    // Form validation
+    // Form validation with better UX
     const forms = document.querySelectorAll('.needs-validation');
     forms.forEach(form => {
         form.addEventListener('submit', function(event) {
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
+                
+                // Add shake animation to invalid fields
+                const invalidFields = form.querySelectorAll(':invalid');
+                invalidFields.forEach(field => {
+                    field.classList.add('animate__animated', 'animate__headShake');
+                    field.addEventListener('animationend', () => {
+                        field.classList.remove('animate__animated', 'animate__headShake');
+                    });
+                });
             }
             form.classList.add('was-validated');
         }, false);
     });
+
+    // Add animation to file upload area
+    const fileUpload = document.querySelector('.file-upload-card');
+    if (fileUpload) {
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('border-primary', 'bg-soft-primary');
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.classList.remove('border-primary', 'bg-soft-primary');
+        });
+    }
 });
 </script>
 @endsection
