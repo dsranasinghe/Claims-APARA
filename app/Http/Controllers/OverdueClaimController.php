@@ -18,9 +18,9 @@ class OverdueClaimController extends Controller
         }
 
         // Fetch application with bank relationship using Eloquent
-        $application = Application::with('bank')
-            ->where('application_no', $applicationNo)
-            ->first();
+        $application = Application::where('application_no', $applicationNo)
+        ->where('bank_id', session('bank_id')) // Filter by bank_id
+        ->firstOrFail(); // 404 if not found
 
         if (!$application) {
             abort(404, 'Application not found');
@@ -36,48 +36,45 @@ class OverdueClaimController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    
+   public function create(Request $request)
 {
-
-
+    // Get or set session data (including bank_id)
     $username = $request->username ?? session('username');
     session([
         'username' => $username,
         'employee_id' => $request->employee_id ?? session('employee_id'),
         'department' => $request->department ?? session('department'),
+        'bank_id' => $request->bank_id ?? session('bank_id'), // Make sure this is set
     ]);
-    // If search parameters were submitted
+
+    // If searching for applications
     if ($request->has('id_no') || $request->has('passport_no')) {
         $request->validate([
             'id_no' => 'nullable|string|max:20',
             'passport_no' => 'nullable|string|max:20'
         ]);
 
-        // Search for applications
-        $applications = Application::query()
+        // Search ONLY applications from the user's bank
+        $applications = Application::where('bank_id', session('bank_id')) // Critical filter
             ->when($request->id_no, function($query) use ($request) {
-                $query->where('id_no', 'like', '%'.$request->id_no.'%');
+                $query->where('id_no', $request->id_no);
             })
             ->when($request->passport_no, function($query) use ($request) {
-                $query->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
+                $query->where('passport_no', $request->passport_no);
             })
             ->with(['bank', 'overdueClaim'])
             ->get();
 
-        // Get pending applications
+        // Get pending applications from same bank
         $pendingApplications = OverdueClaim::where('status', 'pending')
-            ->whereHas('application', function($query) use ($request) {
-                $query->when($request->id_no, function($q) use ($request) {
-                    $q->where('id_no', 'like', '%'.$request->id_no.'%');
-                })
-                ->when($request->passport_no, function($q) use ($request) {
-                    $q->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
-                });
+            ->whereHas('application', function($query) {
+                $query->where('bank_id', session('bank_id')); // Bank filter
             })
             ->with('application')
             ->get();
 
-        // If we found a matching application
+        // Return results
         if ($applications->count() === 1) {
             return view('components.claims.create', [
                 'application' => $applications->first(),
@@ -89,7 +86,6 @@ class OverdueClaimController extends Controller
 
         return view('components.claims.create', [
             'username' => $username,
-            'searchPerformed' => false,
             'searchPerformed' => true,
             'application' => null,
             'claim' => null,
@@ -97,28 +93,30 @@ class OverdueClaimController extends Controller
         ]);
     }
     
-    // Initial access - just show search form
+    // Initial empty search form
     return view('components.claims.create', [
         'searchPerformed' => false,
         'application' => null,
         'claim' => null,
-        'pendingApplications' => collect() // Empty collection
+        'pendingApplications' => collect()
     ]);
 }
-
-   public function updateStatus(Request $request, $id)
+  
+public function updateStatus(Request $request, $id)
 {
     $request->validate([
         'status' => 'required|in:pending,paid'
     ]);
     
-    $claim = OverdueClaim::findOrFail($id);
-    $claim->update(['status' => $request->status]);
+ $claim = OverdueClaim::where('id', $id)
+        ->whereHas('application', fn($q) => $q->where('bank_id', session('bank_id')))
+        ->firstOrFail();    $claim->update(['status' => $request->status]);
     
     return response()->json(['success' => true]);
 }
 
-    public function store(Request $request, $applicationNo)
+    
+public function store(Request $request, $applicationNo)
     {
         $validated = $request->validate([
             'total_repayments' => 'required|numeric|min:0',
@@ -143,10 +141,10 @@ class OverdueClaimController extends Controller
                 ->store('claims/demand-letters', 'public');
         }
 
-        // Get application data to include in claim
-        $application = Application::with('bank')
-            ->where('application_no', $applicationNo)
-            ->first();
+        // First verify the application belongs to the bank
+    $application = Application::where('application_no', $applicationNo)
+        ->where('bank_id', session('bank_id'))
+        ->firstOrFail();
 
         // Create or update claim
         OverdueClaim::updateOrCreate(
@@ -178,7 +176,9 @@ class OverdueClaimController extends Controller
     }
 
 
-   public function pending(Request $request)
+   
+    
+    public function pending(Request $request)
 {
     $query = OverdueClaim::query()
         ->orderBy('created_at', 'desc');
