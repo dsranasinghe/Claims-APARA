@@ -121,7 +121,6 @@
         </div>
     </nav>
 
-    
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar p-3">

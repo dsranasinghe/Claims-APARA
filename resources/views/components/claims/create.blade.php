@@ -6,13 +6,15 @@
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-9">
-           @if($searchPerformed && !$application)
-<div class="alert alert-warning">
-    <i class="bi bi-exclamation-triangle"></i>
-    No applications found in <strong>{{ auth()->user()->bank->name ?? 'your bank' }}</strong> records.
-    Please verify the search criteria.
-</div>
-@endif
+            @if(!$application && $searchPerformed)
+                <div class="alert alert-warning d-flex align-items-center mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                    <div>
+                        <h5 class="alert-heading mb-1">No Application Found</h5>
+                        <p class="mb-0">No application found with the provided identification details.</p>
+                    </div>
+                </div>
+            @endif
 
             @if(!$application)
             <!-- Search Form -->
