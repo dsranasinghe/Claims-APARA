@@ -38,13 +38,16 @@ class OverdueClaimController extends Controller
 
     public function create(Request $request)
 {
-
+     if ($request->has('bank_id')) {
+        session(['bank_id' => $request->bank_id]);
+      }
 
     $username = $request->username ?? session('username');
     session([
         'username' => $username,
         'employee_id' => $request->employee_id ?? session('employee_id'),
         'department' => $request->department ?? session('department'),
+        'bank_id' => $request->bank_id ?? session('bank_id'),
     ]);
     // If search parameters were submitted
     if ($request->has('id_no') || $request->has('passport_no')) {
@@ -54,15 +57,22 @@ class OverdueClaimController extends Controller
         ]);
 
         // Search for applications
-        $applications = Application::query()
-            ->when($request->id_no, function($query) use ($request) {
-                $query->where('id_no', 'like', '%'.$request->id_no.'%');
-            })
-            ->when($request->passport_no, function($query) use ($request) {
-                $query->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
-            })
-            ->with(['bank', 'overdueClaim'])
-            ->get();
+       $applications = Application::query()
+    ->whereHas('bank', function($query) {
+        $query->when(session('bank_id'), function($q) {
+            $q->where('bank_id', session('bank_id'));
+        });
+    })
+    ->where(function($query) use ($request) {
+        $query->when($request->id_no, function($q) use ($request) {
+            $q->where('id_no', 'like', '%'.$request->id_no.'%');
+        })
+        ->when($request->passport_no, function($q) use ($request) {
+            $q->orWhere('passport_no', 'like', '%'.$request->passport_no.'%');
+        });
+    })
+    ->with(['bank', 'overdueClaim'])
+    ->get();
 
         // Get pending applications
         $pendingApplications = OverdueClaim::where('status', 'pending')
