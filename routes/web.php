@@ -27,6 +27,10 @@ Route::get('/report-of-default', function () {
     return view('pages.reportofdefault');
 })->name('report-of-default');
 
+Route::get('/Claims-checklist',function () {
+    return view('pages.claimsChecklist');
+})->name('Claims-checklist');
+
 
 
 Route::get('/claims/create', [OverdueClaimController::class, 'create'])
