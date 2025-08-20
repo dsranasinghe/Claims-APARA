@@ -1,0 +1,220 @@
+/* Overdue Claims Form Styles */
+:root {
+    --primary: #2c3e50;
+    --primary-light: #3498db;
+    --primary-dark: #1a252f;
+    --secondary: #e74c3c;
+    --accent: #2980b9;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --gray: #95a5a6;
+    --success: #27ae60;
+    --warning: #f39c12;
+}
+
+/* Background and container styles */
+.bg-light {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shadow-soft {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Text styles */
+.text-gradient {
+    background: linear-gradient(to right, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Form elements */
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid #e1e8ed;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.input-group-text {
+    background: var(--light);
+    border: 2px solid #e1e8ed;
+    border-right: none;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(to right, var(--primary-light), var(--accent));
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+/* Section titles */
+.section-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--light);
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    margin-right: 10px;
+    color: var(--accent);
+    font-size: 1.4rem;
+}
+
+/* Bank info display */
+.bank-info-container {
+    background-color: rgba(236, 240, 241, 0.5);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.bank-info-row {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.bank-info-label {
+    font-weight: 600;
+    color: var(--primary-dark);
+    min-width: 150px;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.bank-info-label i {
+    margin-right: 8px;
+    color: var(--accent);
+}
+
+.bank-info-value {
+    flex: 1;
+    color: #2c3e50;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+}
+
+.address-field {
+    min-height: 100px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+/* File upload area */
+.file-upload-card {
+    border: 2px dashed rgba(52, 152, 219, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+    background-color: rgba(236, 240, 241, 0.3);
+}
+
+.file-upload-card:hover {
+    border-color: var(--accent);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Animations */
+.animate-slide-up {
+    animation: slideUp 0.6s ease forwards;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(25px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+/* Alert styles */
+.alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.alert-warning {
+    background-color: rgba(243, 156, 18, 0.15);
+    color: #d35400;
+}
+
+.alert-success {
+    background-color: rgba(39, 174, 96, 0.15);
+    color: #27ae60;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bank-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .bank-info-label {
+        margin-bottom: 0.5rem;
+        min-width: auto;
+    }
+    
+    .glass-card {
+        padding: 1.5rem !important;
+    }
+    
+    .bank-info-container {
+        padding: 1rem;
+    }
+}
