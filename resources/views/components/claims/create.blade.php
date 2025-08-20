@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid px-4 py-5 bg-light min-vh-100">
     <div class="row justify-content-center">
-        <div class="col-12 col-xl-9">
+        <div class="col-12 col-xl-10">
             <div class="glass-card shadow-soft rounded-4 p-4 p-md-5 animate-fade-in">
                 <div class="text-center mb-5">
                     <h2 class="fw-bold text-gradient">Overdue Claim Form</h2>
@@ -64,6 +64,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
         demandRadios.forEach(radio => radio.addEventListener('change', toggleSections));
         toggleSections();
+    }
+
+    // Toggle document requirements based on default reason
+    const defaultReasonSelect = document.getElementById('default_reason');
+    const documentRequirementsSection = document.getElementById('document-requirements-section');
+    
+    if (defaultReasonSelect) {
+        function updateDocumentRequirements() {
+            const reason = defaultReasonSelect.value;
+            const requirementItems = document.querySelectorAll('.requirement-item');
+            
+            // Hide all requirements first
+            requirementItems.forEach(item => {
+                item.classList.add('d-none');
+            });
+            
+            // Show requirements based on selected reason
+            if (reason) {
+                documentRequirementsSection.classList.remove('d-none');
+                
+                // Show mandatory documents for all claims
+                document.querySelectorAll('.mandatory-all').forEach(item => {
+                    item.classList.remove('d-none');
+                });
+                
+                // Show section-specific requirements
+                if (reason === 'missing_abroad') {
+                    document.querySelectorAll('.section-b1').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'missing_local') {
+                    document.querySelectorAll('.section-b2').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'deceased') {
+                    document.querySelectorAll('.section-c').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'medically_unfit') {
+                    document.querySelectorAll('.section-d').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'fraud') {
+                    document.querySelectorAll('.section-e').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'refusal_pay') {
+                    document.querySelectorAll('.section-f').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'job_loss') {
+                    document.querySelectorAll('.section-g').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                } else if (reason === 'job_shift') {
+                    document.querySelectorAll('.section-h').forEach(item => {
+                        item.classList.remove('d-none');
+                    });
+                }
+            } else {
+                documentRequirementsSection.classList.add('d-none');
+            }
+        }
+        
+        defaultReasonSelect.addEventListener('change', updateDocumentRequirements);
+        // Initialize on page load if a reason is already selected
+        updateDocumentRequirements();
     }
 
     // Form validation with shake animation
