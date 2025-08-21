@@ -126,7 +126,7 @@
         <div class="sidebar p-3">
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
-                    <a class="nav-link active" href="{{ route('claims.create') }}">
+                    <a class="nav-link" href="{{ route('claims.create') }}">
                         <i class="bi bi-speedometer2"></i> Overdue
                     </a>
                 </li>
