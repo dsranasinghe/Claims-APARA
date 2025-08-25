@@ -98,6 +98,20 @@
                                        data-bs-toggle="tooltip" title="View Details">
                                        <i class="bi bi-eye"></i>
                                     </a>
+@if(Route::has('claims.documents'))
+    <a href="{{ route('claims.documents', $claim->application_no) }}" 
+       class="btn btn-sm btn-outline-info"
+       data-bs-toggle="tooltip" title="Upload Documents">
+       <i class="bi bi-arrow-right-circle"></i>
+    </a>
+@else
+    <button class="btn btn-sm btn-outline-secondary" 
+            data-bs-toggle="tooltip" title="Document upload not available"
+            disabled>
+        <i class="bi bi-arrow-right-circle"></i>
+    </button>
+@endif
+                                    
                                    @if(auth()->check() && auth()->user()->can('approve-payments'))
     <form action="{{ route('claims.update-status', $claim->id) }}" method="POST">
         @csrf
@@ -130,6 +144,17 @@
             </div>
             @endif
         </div>
+    </div>
+</div>
+
+<!-- Toast for status updates -->
+<div class="toast position-fixed top-0 end-0 p-3" id="statusToast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <strong class="me-auto">System Notification</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        Status updated successfully.
     </div>
 </div>
 @endsection

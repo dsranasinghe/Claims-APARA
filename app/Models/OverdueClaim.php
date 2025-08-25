@@ -49,4 +49,9 @@ class OverdueClaim extends Model
     {
         return $this->belongsTo(Application::class, 'application_no', 'application_no');
     }
+
+public function documents()
+    {
+        return $this->hasOne(ClaimDocument::class, 'claim_id');
+    }
 }

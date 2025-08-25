@@ -68,5 +68,9 @@ Route::get('/claims/{application_no}', [OverdueClaimController::class, 'show'])
 
 // Update payment status
 Route::put('/claims/{id}/status', [OverdueClaimController::class, 'updateStatus'])->name('claims.update-status');
+//documents
+Route::get('/claims/{application_no}/documents', [OverdueClaimController::class, 'documents'])
+    ->name('claims.documents');
 
-
+Route::post('/claims/{application_no}/documents/upload', [OverdueClaimController::class, 'uploadDocuments'])
+    ->name('claims.upload-documents');
