@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\OverdueClaim;
+use App\Models\ClaimDocument;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+
 
 class OverdueClaimController extends Controller
 {
@@ -207,5 +209,51 @@ class OverdueClaimController extends Controller
     ]);
 }
 
+public function documents($applicationNo)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        abort(400, 'Invalid application number format');
+    }
 
+    // Fetch the claim with documents
+    $claim = OverdueClaim::with('documents')->where('application_no', $applicationNo)->firstOrFail();
+    
+    // Use the correct view path that matches your file location
+    return view('components.claims.documents', compact('claim'));
+}
+
+public function uploadDocuments(Request $request, $applicationNo)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        abort(400, 'Invalid application number format');
+    }
+
+    // Fetch the claim
+    $claim = OverdueClaim::where('application_no', $applicationNo)->firstOrFail();
+
+    // Validate the request
+    $request->validate([
+        'document_type' => 'required|string|in:formal_claim_application,facility_offer_letter,guarantors_bond,guarantors_statement,loan_repayment_schedule,proof_of_disbursement,recovery_actions,kyc_documents,b1_police_complaint,b1_affidavit,b1_tracing_proof,b2_police_complaint,b2_tracing_proof,death_certificate,medical_certificate_abroad,medical_report_local,fraud_evidence,refusal_correspondence,termination_letter,unemployment_proof,new_employment_letter,income_change_evidence',
+        'document' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+    ]);
+
+    // Process the uploaded file
+    $file = $request->file('document');
+    $path = $file->store('claims/documents/' . $applicationNo, 'public');
+
+    // Get or create claim documents record
+    $claimDocuments = ClaimDocument::firstOrCreate(['claim_id' => $claim->id]);
+
+    // Update the specific document column based on document type
+    $documentType = $request->document_type;
+    $claimDocuments->update([
+        $documentType => $path
+    ]);
+
+    // FIXED: Use the correct route name
+    return redirect()->route('claims.documents', $applicationNo)
+        ->with('success', 'Document uploaded successfully!');
+}
 }
