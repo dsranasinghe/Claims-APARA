@@ -8,7 +8,6 @@
     $cards = [
     'claims' => [
     ['icon' => 'file-earmark-text', 'label' => 'Total Claims', 'count' => 142, 'color' => 'primary'],
-    ['icon' => 'hourglass-split', 'label' => 'Pending', 'count' => 38, 'color' => 'warning'],
     ['icon' => 'check-circle', 'label' => 'Approved', 'count' => 84, 'color' => 'success'],
     ['icon' => 'x-circle', 'label' => 'Rejected', 'count' => 20, 'color' => 'danger'],
     ],
@@ -20,7 +19,6 @@
     'marketing' => [
     ['icon' => 'megaphone', 'label' => 'Total Applications', 'count' => 56, 'color' => 'primary'],
     ['icon' => 'graph-up', 'label' => 'Approved', 'count' => 32, 'color' => 'success'],
-    ['icon' => 'hourglass', 'label' => 'Pending', 'count' => 18, 'color' => 'warning'],
     ['icon' => 'x-circle', 'label' => 'Rejected', 'count' => 6, 'color' => 'danger'],
     ]
     ];

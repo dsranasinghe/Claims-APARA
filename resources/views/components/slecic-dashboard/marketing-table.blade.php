@@ -1,5 +1,5 @@
 <!-- resources/views/components/slecic-dashboard/marketing-table.blade.php -->
- <div class="card border-0 shadow-sm mb-4">
+<div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white border-0 py-3">
         <div class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold">Recent </h5>
@@ -39,16 +39,9 @@
                 <tbody>
                     @foreach($marketingData as $row)
                         <tr>
-                            <!-- Application No + Branch -->
+                            <!-- Application No + Branch (priority filter removed) -->
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
-                                    @if($row['priority'] === 'high')
-                                        <span class="badge bg-danger badge-dot me-2"></span>
-                                    @elseif($row['priority'] === 'medium')
-                                        <span class="badge bg-warning badge-dot me-2"></span>
-                                    @else
-                                        <span class="badge bg-success badge-dot me-2"></span>
-                                    @endif
                                     <div>
                                         <div class="fw-semibold">{{ $row['application_no'] }}</div>
                                         <small class="text-muted">{{ $row['branch_name'] }}</small>
