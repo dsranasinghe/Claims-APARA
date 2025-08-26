@@ -74,3 +74,9 @@ Route::get('/claims/{application_no}/documents', [OverdueClaimController::class,
 
 Route::post('/claims/{application_no}/documents/upload', [OverdueClaimController::class, 'uploadDocuments'])
     ->name('claims.upload-documents');
+
+Route::post('/claims/{application_no}/submit', [OverdueClaimController::class, 'submit'])
+    ->name('claims.submit');
+
+Route::post('/claims/{application_no}/upload-specific', [OverdueClaimController::class, 'uploadSpecificDocument'])
+    ->name('claims.upload-specific-document');
