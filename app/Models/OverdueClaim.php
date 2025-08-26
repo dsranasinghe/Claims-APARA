@@ -32,6 +32,7 @@ class OverdueClaim extends Model
         'total_repayments',
         'amount_outstanding',
         'default_reasons',
+        'default_reason',
         'demand_made',
         'demand_letter_path',
         'no_demand_reason',

@@ -58,6 +58,26 @@
                                             <td>{{ $claim->branch_name }}</td>
                                         </tr>
                                         <tr>
+                                            <th>Default Reason:</th>
+                                            <td>
+                                                @php
+                                                    $reasonLabels = [
+                                                        'missing_abroad' => 'Missing/Absconded in Abroad (B1)',
+                                                        'missing_local' => 'Missing in Sri Lanka After Arrival (B2)',
+                                                        'deceased' => 'Borrower is Deceased (C)',
+                                                        'medically_unfit' => 'Borrower is Medically Unfit/Critically Ill (D)',
+                                                        'fraud' => 'Fraud (E)',
+                                                        'refusal_pay' => 'Refusal to Pay (F)',
+                                                        'job_loss' => 'Loss of Job (G)',
+                                                        'job_shift' => 'Borrower Shifted Job (H)'
+                                                    ];
+                                                @endphp
+                                                <span class="badge bg-info">
+                                                    {{ $reasonLabels[$claim->default_reason] ?? 'Not specified' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th>Amount Outstanding:</th>
                                             <td class="fw-bold">LKR {{ number_format($claim->amount_outstanding, 2) }}</td>
                                         </tr>
@@ -98,7 +118,7 @@
                                             <select class="form-select" id="document_type" name="document_type" required>
                                                 <option value="">-- Select Document Type --</option>
                                                 
-                                                <!-- Section A - Mandatory Documents -->
+                                                <!-- Section A - Mandatory Documents (Always shown) -->
                                                 <optgroup label="Section A - Mandatory Documents">
                                                     <option value="formal_claim_application">Formal Claim Application</option>
                                                     <option value="facility_offer_letter">Facility/Offer Letter</option>
@@ -110,39 +130,54 @@
                                                     <option value="kyc_documents">KYC Documents</option>
                                                 </optgroup>
                                                 
-                                                <!-- Section B1 -->
-                                                <optgroup label="Section B1 - Missing/absconded abroad">
-                                                    <option value="b1_police_complaint">Police Complaint</option>
-                                                    <option value="b1_affidavit">Affidavit</option>
-                                                    <option value="b1_tracing_proof">Tracing Proof</option>
-                                                </optgroup>
-                                                
-                                                <!-- Section B2 -->
-                                                <optgroup label="Section B2 - Missing in Sri Lanka">
-                                                    <option value="b2_police_complaint">Police Complaint</option>
-                                                    <option value="b2_tracing_proof">Tracing Proof</option>
-                                                </optgroup>
-                                                
-                                                <!-- Section C -->
-                                                <optgroup label="Section C - Deceased">
-                                                    <option value="death_certificate">Death Certificate</option>
-                                                </optgroup>
-                                                
-                                                <!-- Section D -->
-                                                <optgroup label="Section D - Medically Unfit">
-                                                    <option value="medical_certificate_abroad">Medical Certificate (Abroad)</option>
-                                                    <option value="medical_report_local">Medical Report (Local)</option>
-                                                </optgroup>
-                                                
-                                                <!-- Other Sections -->
-                                                <optgroup label="Other Sections">
-                                                    <option value="fraud_evidence">Fraud Evidence</option>
-                                                    <option value="refusal_correspondence">Refusal Correspondence</option>
-                                                    <option value="termination_letter">Termination Letter</option>
-                                                    <option value="unemployment_proof">Unemployment Proof</option>
-                                                    <option value="new_employment_letter">New Employment Letter</option>
-                                                    <option value="income_change_evidence">Income Change Evidence</option>
-                                                </optgroup>
+                                                <!-- Dynamic sections based on default reason -->
+                                                @if($claim->default_reason === 'missing_abroad')
+                                                    <!-- Section B1 -->
+                                                    <optgroup label="Section B1 - Missing/absconded abroad">
+                                                        <option value="b1_police_complaint">Police Complaint</option>
+                                                        <option value="b1_affidavit">Affidavit</option>
+                                                        <option value="b1_tracing_proof">Tracing Proof</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'missing_local')
+                                                    <!-- Section B2 -->
+                                                    <optgroup label="Section B2 - Missing in Sri Lanka">
+                                                        <option value="b2_police_complaint">Police Complaint</option>
+                                                        <option value="b2_tracing_proof">Tracing Proof</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'deceased')
+                                                    <!-- Section C -->
+                                                    <optgroup label="Section C - Deceased">
+                                                        <option value="death_certificate">Death Certificate</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'medically_unfit')
+                                                    <!-- Section D -->
+                                                    <optgroup label="Section D - Medically Unfit">
+                                                        <option value="medical_certificate_abroad">Medical Certificate (Abroad)</option>
+                                                        <option value="medical_report_local">Medical Report (Local)</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'fraud')
+                                                    <!-- Section E -->
+                                                    <optgroup label="Section E - Fraud">
+                                                        <option value="fraud_evidence">Fraud Evidence</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'refusal_pay')
+                                                    <!-- Section F -->
+                                                    <optgroup label="Section F - Refusal to Pay">
+                                                        <option value="refusal_correspondence">Refusal Correspondence</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'job_loss')
+                                                    <!-- Section G -->
+                                                    <optgroup label="Section G - Loss of Job">
+                                                        <option value="termination_letter">Termination Letter</option>
+                                                        <option value="unemployment_proof">Unemployment Proof</option>
+                                                    </optgroup>
+                                                @elseif($claim->default_reason === 'job_shift')
+                                                    <!-- Section H -->
+                                                    <optgroup label="Section H - Borrower Shifted Job">
+                                                        <option value="new_employment_letter">New Employment Letter</option>
+                                                        <option value="income_change_evidence">Income Change Evidence</option>
+                                                    </optgroup>
+                                                @endif
                                             </select>
                                         </div>
                                         
@@ -255,7 +290,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <!-- Section A -->
+                                    <!-- Section A - Always required -->
                                     <h6 class="text-primary">Section A - Mandatory Documents</h6>
                                     @foreach([
                                         'formal_claim_application' => 'Formal Claim Application',
@@ -280,29 +315,134 @@
                                     @endforeach
                                 </div>
                                 <div class="col-md-6">
-                                    <!-- Other Sections -->
-                                    <h6 class="text-primary">Additional Documents</h6>
-                                    @foreach([
-                                        'b1_police_complaint' => 'B1 Police Complaint',
-                                        'b1_affidavit' => 'B1 Affidavit',
-                                        'b1_tracing_proof' => 'B1 Tracing Proof',
-                                        'b2_police_complaint' => 'B2 Police Complaint',
-                                        'b2_tracing_proof' => 'B2 Tracing Proof',
-                                        'death_certificate' => 'Death Certificate',
-                                        'medical_certificate_abroad' => 'Medical Certificate (Abroad)',
-                                        'medical_report_local' => 'Medical Report (Local)'
-                                    ] as $field => $label)
+                                    <!-- Dynamic sections based on default reason -->
+                                    <h6 class="text-primary">Additional Required Documents</h6>
+                                    @if($claim->default_reason === 'missing_abroad')
+                                        <!-- Section B1 -->
+                                        @foreach([
+                                            'b1_police_complaint' => 'B1 Police Complaint',
+                                            'b1_affidavit' => 'B1 Affidavit',
+                                            'b1_tracing_proof' => 'B1 Tracing Proof'
+                                        ] as $field => $label)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    id="check_{{ $field }}" 
+                                                    {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                    disabled>
+                                                <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
+                                                    for="check_{{ $field }}">
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @elseif($claim->default_reason === 'missing_local')
+                                        <!-- Section B2 -->
+                                        @foreach([
+                                            'b2_police_complaint' => 'B2 Police Complaint',
+                                            'b2_tracing_proof' => 'B2 Tracing Proof'
+                                        ] as $field => $label)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    id="check_{{ $field }}" 
+                                                    {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                    disabled>
+                                                <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
+                                                    for="check_{{ $field }}">
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @elseif($claim->default_reason === 'deceased')
+                                        <!-- Section C -->
                                         <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox" 
-                                                id="check_{{ $field }}" 
-                                                {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                id="check_death_certificate" 
+                                                {{ $claim->documents && !empty($claim->documents->death_certificate) ? 'checked' : '' }}
                                                 disabled>
-                                            <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
-                                                for="check_{{ $field }}">
-                                                {{ $label }}
+                                            <label class="form-check-label {{ $claim->documents && !empty($claim->documents->death_certificate) ? 'text-success' : '' }}" 
+                                                for="check_death_certificate">
+                                                Death Certificate
                                             </label>
                                         </div>
-                                    @endforeach
+                                    @elseif($claim->default_reason === 'medically_unfit')
+                                        <!-- Section D -->
+                                        @foreach([
+                                            'medical_certificate_abroad' => 'Medical Certificate (Abroad)',
+                                            'medical_report_local' => 'Medical Report (Local)'
+                                        ] as $field => $label)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    id="check_{{ $field }}" 
+                                                    {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                    disabled>
+                                                <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
+                                                    for="check_{{ $field }}">
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @elseif($claim->default_reason === 'fraud')
+                                        <!-- Section E -->
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" 
+                                                id="check_fraud_evidence" 
+                                                {{ $claim->documents && !empty($claim->documents->fraud_evidence) ? 'checked' : '' }}
+                                                disabled>
+                                            <label class="form-check-label {{ $claim->documents && !empty($claim->documents->fraud_evidence) ? 'text-success' : '' }}" 
+                                                for="check_fraud_evidence">
+                                                Fraud Evidence
+                                            </label>
+                                        </div>
+                                    @elseif($claim->default_reason === 'refusal_pay')
+                                        <!-- Section F -->
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" 
+                                                id="check_refusal_correspondence" 
+                                                {{ $claim->documents && !empty($claim->documents->refusal_correspondence) ? 'checked' : '' }}
+                                                disabled>
+                                            <label class="form-check-label {{ $claim->documents && !empty($claim->documents->refusal_correspondence) ? 'text-success' : '' }}" 
+                                                for="check_refusal_correspondence">
+                                                Refusal Correspondence
+                                            </label>
+                                        </div>
+                                    
+                                    @elseif($claim->default_reason === 'job_loss')
+                                        <!-- Section G -->
+                                        @foreach([
+                                            'termination_letter' => 'Termination Letter',
+                                            'unemployment_proof' => 'Unemployment Proof'
+                                        ] as $field => $label)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    id="check_{{ $field }}" 
+                                                    {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                    disabled>
+                                                <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
+                                                    for="check_{{ $field }}">
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    @elseif($claim->default_reason === 'job_shift')
+                                        <!-- Section H -->
+                                        @foreach([
+                                            'new_employment_letter' => 'New Employment Letter',
+                                            'income_change_evidence' => 'Income Change Evidence'
+                                        ] as $field => $label)
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" 
+                                                    id="check_{{ $field }}" 
+                                                    {{ $claim->documents && !empty($claim->documents->$field) ? 'checked' : '' }}
+                                                    disabled>
+                                                <label class="form-check-label {{ $claim->documents && !empty($claim->documents->$field) ? 'text-success' : '' }}" 
+                                                    for="check_{{ $field }}">
+                                                    {{ $label }}
+                                                </label>
+                                            </div>
+
+                                            
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>
