@@ -136,6 +136,7 @@ class OverdueClaimController extends Controller
             'total_repayments' => 'required|numeric|min:0',
             'amount_outstanding' => 'required|numeric|min:0',
             'default_reasons' => 'required|string|max:1000',
+            'default_reason' => 'nullable|string|max:255',
             'demand_made' => 'required|boolean',
             'demand_letter' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'no_demand_reason' => 'nullable|string|max:500|required_if:demand_made,false',
@@ -171,6 +172,7 @@ class OverdueClaimController extends Controller
                 'total_repayments' => $validated['total_repayments'],
                 'amount_outstanding' => $validated['amount_outstanding'],
                 'default_reasons' => $validated['default_reasons'],
+                'default_reason' => $validated['default_reason'] ?? null,
                 'demand_made' => $validated['demand_made'],
                 'demand_letter_path' => $demandLetterPath,
                 'no_demand_reason' => $validated['no_demand_reason'] ?? null,
@@ -291,3 +293,136 @@ class OverdueClaimController extends Controller
     return view('pages.reportofdefault', compact('reports'));
 }
 }
+
+
+public function submit($applicationNo)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        abort(400, 'Invalid application number format');
+    }
+
+    // Fetch the claim with documents
+    $claim = OverdueClaim::with('documents')->where('application_no', $applicationNo)->firstOrFail();
+    
+    // Check if all required documents are uploaded
+    $requiredDocuments = $this->getRequiredDocuments($claim->default_reason);
+    $uploadedCount = 0;
+    
+    if ($claim->documents) {
+        foreach ($requiredDocuments as $documentField) {
+            if (!empty($claim->documents->$documentField)) {
+                $uploadedCount++;
+            }
+        }
+    }
+    
+    // If not all documents are uploaded, redirect back with error
+    if ($uploadedCount < count($requiredDocuments)) {
+        return redirect()->route('claims.documents', $applicationNo)
+            ->with('error', 'Please upload all required documents before submitting.');
+    }
+    
+    // Update claim status to submitted
+    $claim->update(['status' => 'submitted']);
+    
+    return redirect()->route('claims.pending')
+        ->with('success', 'Application #' . $applicationNo . ' has been submitted successfully!');
+}
+
+// Helper method to get required documents based on default reason
+private function getRequiredDocuments($defaultReason)
+{
+    $required = [
+        'formal_claim_application',
+        'facility_offer_letter',
+        'guarantors_bond',
+        'guarantors_statement',
+        'loan_repayment_schedule',
+        'proof_of_disbursement',
+        'recovery_actions',
+        'kyc_documents'
+    ];
+    
+    // Add documents based on default reason
+    switch ($defaultReason) {
+        case 'missing_abroad':
+            array_push($required, 'b1_police_complaint', 'b1_affidavit', 'b1_tracing_proof');
+            break;
+        case 'missing_local':
+            array_push($required, 'b2_police_complaint', 'b2_tracing_proof');
+            break;
+        case 'deceased':
+            array_push($required, 'death_certificate');
+            break;
+        case 'medically_unfit':
+            array_push($required, 'medical_certificate_abroad', 'medical_report_local');
+            break;
+        case 'fraud':
+            array_push($required, 'fraud_evidence');
+            break;
+        case 'refusal_pay':
+            array_push($required, 'refusal_correspondence');
+            break;
+        case 'job_loss':
+            array_push($required, 'termination_letter', 'unemployment_proof');
+            break;
+        case 'job_shift':
+            array_push($required, 'new_employment_letter', 'income_change_evidence');
+            break;
+    }
+    
+    return $required;
+}
+
+public function uploadSpecificDocument(Request $request, $applicationNo)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        if ($request->ajax()) {
+            return response()->json(['error' => 'Invalid application number format'], 400);
+        }
+        abort(400, 'Invalid application number format');
+    }
+
+    // Fetch the claim
+    $claim = OverdueClaim::where('application_no', $applicationNo)->firstOrFail();
+
+    // Validate the request
+    $request->validate([
+        'document_type' => 'required|string',
+        'document' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+    ]);
+
+    try {
+        // Process the uploaded file
+        $file = $request->file('document');
+        $path = $file->store('claims/documents/' . $applicationNo, 'public');
+
+        // Get or create claim documents record
+        $claimDocuments = ClaimDocument::firstOrCreate(['claim_id' => $claim->id]);
+
+        // Update the specific document column
+        $documentType = $request->document_type;
+        $claimDocuments->update([
+            $documentType => $path
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Document uploaded successfully!']);
+        }
+
+        return redirect()->route('claims.documents', $applicationNo)
+            ->with('success', 'Document uploaded successfully!');
+
+    } catch (\Exception $e) {
+        if ($request->ajax()) {
+            return response()->json(['error' => 'Error uploading document: ' . $e->getMessage()], 500);
+        }
+
+        return redirect()->route('claims.documents', $applicationNo)
+            ->with('error', 'Error uploading document: ' . $e->getMessage());
+    }
+}
+}
+
