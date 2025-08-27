@@ -50,8 +50,34 @@ class OverdueClaim extends Model
         return $this->belongsTo(Application::class, 'application_no', 'application_no');
     }
 
-public function documents()
+    public function documents()
     {
         return $this->hasOne(ClaimDocument::class, 'claim_id');
+    }
+
+    public function approvals()
+    {
+        return $this->hasMany(ClaimApproval::class, 'claim_id');
+    }
+
+    
+    public function marketingInitial()
+    {
+        return $this->approvals()->where('department', 'Marketing')->where('approval_type', 'Initial');
+    }
+
+    public function marketingFinal()
+    {
+        return $this->approvals()->where('department', 'Marketing')->where('approval_type', 'Final');
+    }
+
+    public function operationsInitial()
+    {
+        return $this->approvals()->where('department', 'Operations')->where('approval_type', 'Initial');
+    }
+
+    public function operationsFinal()
+    {
+        return $this->approvals()->where('department', 'Operations')->where('approval_type', 'Final');
     }
 }
