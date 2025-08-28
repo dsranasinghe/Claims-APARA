@@ -2,7 +2,7 @@
     @csrf
     <input type="hidden" name="document_type" value="{{ $field }}">
     
-    <div class="mb-2">
+    <div class="mb-2 d-flex align-items-center justify-content-between">
         <label class="form-label fw-semibold">{{ $label }}</label>
         <span class="upload-status badge ms-2" id="status-{{ $field }}">
             @if($claim->documents && !empty($claim->documents->$field))
@@ -26,4 +26,22 @@
             </button>
         </div>
     </div>
+
+   @if($claim->documents && !empty($claim->documents->$field))
+<div class="mt-3">
+    <div class="d-flex gap-2">
+        <!-- VIEW -->
+        <a href="{{ asset('storage/' . $claim->documents->$field) }}" target="_blank">View Document</a>
+
+
+        <!-- DELETE -->
+        <button type="button" 
+                class="btn btn-sm btn-outline-danger delete-document" 
+                data-document-type="{{ $field }}">
+            <i class="bi bi-trash me-1"></i> Delete
+        </button>
+    </div>
+</div>
+@endif
+
 </form>
