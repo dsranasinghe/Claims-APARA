@@ -292,7 +292,6 @@ class OverdueClaimController extends Controller
 
     return view('pages.reportofdefault', compact('reports'));
 }
-}
 
 
 public function submit($applicationNo)
@@ -502,5 +501,5 @@ public function checkDocument(Request $request, $applicationNo)
 
     return response()->json(['uploadedCount' => $uploadedCount]);
 }
-}
 
+}
