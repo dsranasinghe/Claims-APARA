@@ -388,4 +388,82 @@ public function uploadSpecificDocument(Request $request, $applicationNo)
             ->with('error', 'Error uploading document: ' . $e->getMessage());
     }
 }
+
+
+public function deleteDocument($applicationNo, $documentType)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        return response()->json(['error' => 'Invalid application number format'], 400);
+    }
+
+    // Validate document type
+    $validDocumentTypes = [
+        'formal_claim_application', 'facility_offer_letter', 'guarantors_bond', 
+        'guarantors_statement', 'loan_repayment_schedule', 'proof_of_disbursement',
+        'recovery_actions', 'kyc_documents', 'b1_police_complaint', 'b1_affidavit',
+        'b1_tracing_proof', 'b2_police_complaint', 'b2_tracing_proof', 'death_certificate',
+        'medical_certificate_abroad', 'medical_report_local', 'fraud_evidence',
+        'refusal_correspondence', 'termination_letter', 'unemployment_proof',
+        'new_employment_letter', 'income_change_evidence'
+    ];
+
+    if (!in_array($documentType, $validDocumentTypes)) {
+        return response()->json(['error' => 'Invalid document type'], 400);
+    }
+
+    // Fetch the claim with documents
+    $claim = OverdueClaim::with('documents')->where('application_no', $applicationNo)->firstOrFail();
+
+    if (!$claim->documents || empty($claim->documents->$documentType)) {
+        return response()->json(['error' => 'Document not found'], 404);
+    }
+
+    try {
+        $filePath = $claim->documents->$documentType;
+
+        // Check if file exists before trying to delete
+        if (Storage::disk('public')->exists($filePath)) {
+            // Delete the file from storage
+            Storage::disk('public')->delete($filePath);
+        }
+
+        // Update the document record to remove the file path
+        $claim->documents->update([
+            $documentType => null
+        ]);
+
+        return response()->json(['success' => 'Document deleted successfully']);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error deleting document: ' . $e->getMessage()], 500);
+    }
+}
+
+public function checkDocument(Request $request, $applicationNo)
+{
+    // Validate application number format
+    if (!preg_match('/^[A-Z0-9\-]+$/', $applicationNo)) {
+        return response()->json(['error' => 'Invalid application number format'], 400);
+    }
+
+    // Fetch the claim with documents
+    $claim = OverdueClaim::with('documents')->where('application_no', $applicationNo)->firstOrFail();
+
+    if (!$claim->documents) {
+        return response()->json(['uploadedCount' => 0]);
+    }
+
+    // Get required documents based on default reason
+    $requiredDocuments = $this->getRequiredDocuments($claim->default_reason);
+    $uploadedCount = 0;
+
+    foreach ($requiredDocuments as $documentField) {
+        if (!empty($claim->documents->$documentField)) {
+            $uploadedCount++;
+        }
+    }
+
+    return response()->json(['uploadedCount' => $uploadedCount]);
+}
 }

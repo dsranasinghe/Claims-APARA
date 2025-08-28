@@ -28,6 +28,8 @@
         </div>
     </div>
 </div>
+                    @include('components.claims.partials.delete-modal')
+
 @endsection
 
 @push('styles')
@@ -90,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Clear the file input
                     this.querySelector('input[type="file"]').value = '';
                     
+                    // Reload the page to show view/delete buttons
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    
                 } else {
                     throw new Error(result.message || 'Upload failed');
                 }
@@ -101,6 +108,93 @@ document.addEventListener('DOMContentLoaded', function() {
                 uploadBtn.disabled = false;
             }
         });
+    });
+
+    // Handle view document buttons - check if file exists
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('view-document') || e.target.closest('.view-document')) {
+            e.preventDefault();
+            const viewBtn = e.target.classList.contains('view-document') ? e.target : e.target.closest('.view-document');
+            const documentPath = viewBtn.dataset.documentPath;
+            
+            // Check if document exists before opening
+            fetch("{{ route('claims.check-document', ['application_no' => $claim->application_no]) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ document_path: documentPath })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    window.open(viewBtn.href, '_blank');
+                } else {
+                    showAlert('Document not found. It may have been deleted or moved.', 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('Error checking document: ' + error.message, 'error');
+            });
+        }
+    });
+
+    // Handle delete document buttons
+    const deleteButtons = document.querySelectorAll('.delete-document');
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteDocumentModal'));
+    const deleteForm = document.getElementById('deleteDocumentForm');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const documentType = this.dataset.documentType;
+            const deleteUrl = "{{ route('claims.delete-document', ['application_no' => $claim->application_no, 'document_type' => 'DOC_TYPE']) }}".replace('DOC_TYPE', documentType);
+            
+            deleteForm.action = deleteUrl;
+            deleteModal.show();
+        });
+    });
+
+    // Handle delete form submission
+    deleteForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spinner"></i> Deleting...';
+        submitBtn.disabled = true;
+        
+        try {
+            const response = await fetch(this.action, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                deleteModal.hide();
+                showAlert('Document deleted successfully!', 'success');
+                
+                // Reload the page to update the UI
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                throw new Error(result.message || 'Delete failed');
+            }
+        } catch (error) {
+            showAlert(error.message || 'Error deleting document. Please try again.', 'error');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
     });
     
     // Function to show alert messages

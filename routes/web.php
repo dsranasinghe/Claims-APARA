@@ -80,3 +80,9 @@ Route::post('/claims/{application_no}/submit', [OverdueClaimController::class, '
 
 Route::post('/claims/{application_no}/upload-specific', [OverdueClaimController::class, 'uploadSpecificDocument'])
     ->name('claims.upload-specific-document');
+
+Route::delete('/claims/{application_no}/documents/{document_type}', [OverdueClaimController::class, 'deleteDocument'])
+    ->name('claims.delete-document');
+
+Route::post('/claims/{application_no}/check-document', [OverdueClaimController::class, 'checkDocument'])
+    ->name('claims.check-document');
