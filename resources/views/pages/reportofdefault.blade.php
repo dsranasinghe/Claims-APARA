@@ -2,6 +2,20 @@
 
 @section('content')
 <div class="container py-4">
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-x-circle me-2"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
     <!-- Page Header with improved spacing -->
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
@@ -12,45 +26,7 @@
         </div>
     </div>
     
-    <!-- Hardcoded Data Array -->
-    @php
-    $reports = [
-    [
-    'id' => 1,
-    'debtor' => 'John Smith',
-    'bank' => 'Commercial Bank',
-    'branch' => 'Colombo Main',
-    'submitted_date' => '2023-10-15',
-    'initial_approver' => 'Alex Johnson',
-    'final_approver' => 'Sam Wilson',
-    'status' => 'Pending',
-    'letter_of_demand' => 'letters/john_smith.pdf'
-    ],
-    [
-    'id' => 2,
-    'debtor' => 'Maria Garcia',
-    'bank' => 'National Savings',
-    'branch' => 'Kandy City',
-    'submitted_date' => '2023-10-18',
-    'initial_approver' => 'Taylor Swift',
-    'final_approver' => '-',
-    'status' => 'Initial Approved',
-    'letter_of_demand' => null
-    ],
-    [
-    'id' => 3,
-    'debtor' => 'David Kim',
-    'bank' => 'Global Finance',
-    'branch' => 'Galle Fort',
-    'submitted_date' => '2023-10-20',
-    'initial_approver' => 'Jamie Lee',
-    'final_approver' => 'Chris Evans',
-    'status' => 'Final Approved',
-    'letter_of_demand' => null
-    ]
-    ];
-    @endphp
-    
+
     <!-- Filter Section -->
     <x-marketing.reportofdefault-filter />
     

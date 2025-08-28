@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OverdueClaimController;
+use App\Http\Controllers\ClaimApprovalController;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\DashboardController;
@@ -14,19 +15,20 @@ Route::get('/', function () {
     return view('welcome');  
 });
 
-Route::get('/slecic-claim-dashboard', function (\Illuminate\Http\Request $request) {
-    session([
-        'username'   => $request->username,
-        'employee_id' => $request->employee_id,
-        'department' => $request->department,
-    ]);
 
-    return view('SlecicClaimDashboard');
-}) ->name('slecic-claim-dashboard');
+Route::middleware('store.slecic.session')->group(function () {
+    Route::get('/slecic-claim-dashboard', function () {
+        return view('SlecicClaimDashboard');
+    })->name('slecic-claim-dashboard');
+});
 
-Route::get('/report-of-default', function () {
-    return view('pages.reportofdefault');
-})->name('report-of-default');
+
+ 
+Route::get('/report-of-default', [OverdueClaimController::class, 'reportOfDefault'])
+    ->name('report-of-default');
+
+Route::post('/claims/{id}/approve', [ClaimApprovalController::class, 'approve'])
+    ->name('claims.approve');
 
 Route::get('/Claims-checklist',function () {
     return view('pages.claimsChecklist');

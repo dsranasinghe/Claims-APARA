@@ -69,46 +69,107 @@
                             <span class="text-muted">Not Attached</span>
                             @endif
                         </td>
-
                         <td>
                             {{-- Initial Approver column --}}
-                            @if($report['status'] === 'Pending')
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-success rounded-circle" title="Approve Initial">
+                            @php
+                            $department = strtolower(session('department'));
+                            $initialApproval = collect($report['approvals'])
+                            ->where('department', session('department'))
+                            ->where('approval_type', 'initial_' . $department) // ← CORRECT: using 'approval_type'
+                            ->first();
+                            @endphp
+                            @if($initialApproval)
+                            {{-- Display existing initial approval --}}
+                          @if(strtolower($initialApproval['status']) === 'approved')
+                            <span class="text-success">{{ $initialApproval['approver_name'] }}</span>
+                            @else
+                            <span class="text-danger">{{ $initialApproval['approver_name'] }}</span>
+                            @endif
+                            @else
+                            {{-- Show buttons only if no initial approval exists --}}
+                            {{-- Initial Approval Forms --}}
+                            <form action="{{ route('claims.approve', $report['id']) }}"
+                                method="POST"
+                                class="d-inline approval-form"
+                                data-claim-id="{{ $report['id'] }}">
+                                @csrf
+                                <input type="hidden" name="department" value="{{ session('department') }}">
+                                <input type="hidden" name="approval_type" value="initial_{{ strtolower(session('department')) }}"> {{-- e.g., initial_marketing --}}
+                                <input type="hidden" name="status" value="Approved">
+                                <button type="submit" class="btn btn-sm btn-outline-success rounded-circle" title="Approve Initial">
                                     <i class="bi bi-check"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger rounded-circle" title="Reject Initial">
+                            </form>
+
+                            <form action="{{ route('claims.approve', $report['id']) }}"
+                                method="POST"
+                                class="d-inline approval-form"
+                                data-claim-id="{{ $report['id'] }}">
+                                @csrf
+                                <input type="hidden" name="department" value="{{ session('department') }}">
+                                <input type="hidden" name="approval_type" value="initial_{{ strtolower(session('department')) }}"> {{-- e.g., initial_marketing --}}
+                                <input type="hidden" name="status" value="Rejected">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Reject Initial">
                                     <i class="bi bi-x"></i>
                                 </button>
-                            </div>
-                            @else
-                            <div class="d-flex align-items-center">
-                                <span>{{ $report['initial_approver'] }}</span>
-                            </div>
+                            </form>
                             @endif
                         </td>
 
                         <td>
                             {{-- Final Approver column --}}
-                            @if($report['status'] === 'Initial Approved')
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-success rounded-circle" title="Approve Final">
+                            @php
+                            $department = strtolower(session('department'));
+                            $initialApproval = collect($report['approvals'])
+                            ->where('department', session('department'))
+                            ->where('approval_type', 'initial_' . $department) // e.g., initial_marketing
+                            ->first();
+
+                            $finalApproval = collect($report['approvals'])
+                            ->where('department', session('department'))
+                            ->where('approval_type', 'final_' . $department) // e.g., final_marketing
+                            ->first();
+                            @endphp
+                            @if($finalApproval)
+                            {{-- Display existing final approval --}}
+                            @if($finalApproval['status'] === 'approved')
+                            <span class="text-success">{{ $finalApproval['approver_name'] }}</span>
+                            @else
+                            <span class="text-danger">{{ $finalApproval['approver_name'] }}</span>
+                            @endif
+                         @elseif($initialApproval && strtolower($initialApproval['status']) === 'approved')
+                            {{-- Show final buttons only if initial is approved and no final approval exists --}}
+                            {{-- Final Approval Forms --}}
+                            <form action="{{ route('claims.approve', $report['id']) }}"
+                                method="POST"
+                                class="d-inline approval-form"
+                                data-claim-id="{{ $report['id'] }}">
+                                @csrf
+                                <input type="hidden" name="department" value="{{ session('department') }}">
+                                <input type="hidden" name="approval_type" value="final_{{ strtolower(session('department')) }}"> {{-- e.g., final_marketing --}}
+                                <input type="hidden" name="status" value="Approved">
+                                <button type="submit" class="btn btn-sm btn-outline-success rounded-circle" title="Approve Final">
                                     <i class="bi bi-check"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger rounded-circle" title="Reject Final">
+                            </form>
+
+                            <form action="{{ route('claims.approve', $report['id']) }}"
+                                method="POST"
+                                class="d-inline approval-form"
+                                data-claim-id="{{ $report['id'] }}">
+                                @csrf
+                                <input type="hidden" name="department" value="{{ session('department') }}">
+                                <input type="hidden" name="approval_type" value="final_{{ strtolower(session('department')) }}"> {{-- e.g., final_marketing --}}
+                                <input type="hidden" name="status" value="Rejected">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Reject Final">
                                     <i class="bi bi-x"></i>
                                 </button>
-                            </div>
-                            @elseif($report['status'] === 'Final Approved')
-                            <div class="d-flex align-items-center">
-                                <span>{{ $report['final_approver'] }}</span>
-                            </div>
+                            </form>
                             @else
-                            {{-- Restrict premature final approval --}}
+                            {{-- Show message when final approval is not available --}}
                             <span class="text-muted">Not available</span>
                             @endif
                         </td>
-
                         <td>
                             @php
                             $statusColor = [
@@ -159,3 +220,20 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-refresh after form submission
+        document.querySelectorAll('.approval-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000); // Refresh after 1 second
+                // Disable buttons immediately to prevent double clicks
+                this.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="bi bi-hourglass"></i>';
+                });
+            });
+        });
+    });
+</script>
